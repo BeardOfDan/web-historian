@@ -39,3 +39,16 @@ exports.isUrlArchived = function(url, callback) {
 
 exports.downloadUrls = function(urls) {
 };
+
+
+// Purposes of the above methods according to the tests
+// #readListOfUrls
+//       4) should read urls from sites.txt
+//     #isUrlInList
+//       5) should check if a url is in the list
+//     #addUrlToList
+//       6) should add a url to the list
+//     #isUrlArchived
+//       7) should check if a url is archived
+//     #downloadUrls
+//       ✓ should download all pending urls in the list (504ms)

@@ -57,9 +57,9 @@ exports.handleRequest = function (req, res) {
       const request = http.request(options, (r)=> {  
       // if the url is live, then no error will be thrown   
 
-        console.log('about to read the file ' + archive.paths.archivedSites);
-   
-        fs.readFile(archive.paths.archivedSites + '/' + url, (error, data) => {
+        console.log('about to read the file ' + archive.paths.archivedSites + '/' + url);
+
+        fs.readFile((archive.paths.archivedSites + '/' + url), (error, data) => {
           if (error) { // if this file does not yet exist
             fs.readFile(archive.paths.list, 'utf-8', (error, data) => {
 
@@ -74,26 +74,38 @@ exports.handleRequest = function (req, res) {
 
                 console.log('the file includes ' + url);
 
+
+
+                // should be writing the files instead of http.get-ing them
+
                 const options = {
                   host: url, 
                   port: 80,
                   path: '/'
                 };
-            
+                
                 http.get(options, (thisResponse)=>{
                   // console.log('response object inside get request');
                   // console.log(res);
-                  let body = '';
+                  // let body = '';
 
-                  thisResponse.on('data', function(data) {
-                    body += data;
-                  });
-                  thisResponse.on('end', function() {
-                    res.end(body);
-                  });
+                  // thisResponse.on('data', function(data) {
+                  //   body += data;
+                  // });
+                  // thisResponse.on('end', function() {
+                  //   res.end(body);
+                  thisResponse.pipe(fs.createWriteStream(archive.paths.archivedSites + '/' + url));
+                  
+                  statusCode = 200;
+                  res.writeHead(statusCode, headers);
+                  var readStream = fs.createReadStream(archive.paths.siteAssets + '/loading.html');
+                  readStream.pipe(res);     
+      
                 }).on('error', (e)=> {
                   console.log(e, 'error!');  
                 });
+
+
 
               } else {
 
