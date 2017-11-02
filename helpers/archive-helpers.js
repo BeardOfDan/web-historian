@@ -45,16 +45,12 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  // append the url to the sites.txt file
   fs.appendFile(exports.paths.list, url, (error)=> {
     if (error) {
       console.log('error!');
       console.log('headers', r.headers);
     } else {
-      console.log('Added ' + url + ' to the list');
-      // statusCode = 200;
       callback(true);
-
     }
   });
 
@@ -62,7 +58,6 @@ exports.addUrlToList = function(url, callback) {
 
 exports.isUrlArchived = function(url, callback) {
   fs.readFile((exports.paths.archivedSites + '/' + url), (error, data) => {
-
     if (error) {
       callback(false);
     } else {
@@ -72,7 +67,6 @@ exports.isUrlArchived = function(url, callback) {
 };
 
 exports.downloadUrls = function(urls) {
-
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i];
 
@@ -83,25 +77,7 @@ exports.downloadUrls = function(urls) {
     };
     
     http.get(options, (thisResponse)=>{
-      console.log('response object inside get request');
-      // console.log(res);
-      // let body = '';
-
-      // thisResponse.on('data', function(data) {
-      //   body += data;
-      // });
-      // thisResponse.on('end', function() {
-      //   res.end(body);
       thisResponse.pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
-      
-
-      // statusCode = 200;
-      // let headers = {};
-      // headers['Content-type'] = 'text/html';
-      // res.writeHead(statusCode, headers);
-      // var readStream = fs.createReadStream(exports.paths.siteAssets + '/loading.html');
-      // readStream.pipe(res);     
-
     }).on('error', (e)=> {
       console.log(e, 'error!');  
     });
@@ -109,23 +85,3 @@ exports.downloadUrls = function(urls) {
 
 };
 
-
-// Purposes of the above methods according to the tests
-// #readListOfUrls
-//       4) should read urls from sites.txt
-//     #isUrlInList
-//       5) should check if a url is in the list
-//     #addUrlToList
-//       6) should add a url to the list
-//     #isUrlArchived
-//       7) should check if a url is archived
-//     #downloadUrls
-//       ✓ should download all pending urls in the list (504ms)
-
-// const archive = exports;
-
-// var statusCode = 404;
-//   var headers = {};
-//   headers['Content-type'] = 'text/html';
-
-// exports.

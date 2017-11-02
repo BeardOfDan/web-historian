@@ -24,7 +24,6 @@ var handleUrl = function(req, res, url, statusCode = 200) {
     console.log('about to read the file ' + archive.paths.archivedSites + '/' + url);
 
     fs.readFile((archive.paths.archivedSites + '/' + url), (error, data) => {
-
       if (error) { // if this file does not yet exist
         fs.readFile(archive.paths.list, 'utf-8', (error, data) => {
 
@@ -37,7 +36,7 @@ var handleUrl = function(req, res, url, statusCode = 200) {
           data = data.split('\n');
 
 
-          if (data.includes(url)) {
+          if (data.includes(url)) { // the url is on the list
 
             console.log('the file includes ' + url);
 
@@ -50,18 +49,9 @@ var handleUrl = function(req, res, url, statusCode = 200) {
             
             http.get(options, (thisResponse)=>{
               console.log('response object inside get request');
-              // console.log(res);
-              // let body = '';
 
-              // thisResponse.on('data', function(data) {
-              //   body += data;
-              // });
-              // thisResponse.on('end', function() {
-              //   res.end(body);
               thisResponse.pipe(fs.createWriteStream(archive.paths.archivedSites + '/' + url));
               
-
-              // statusCode = 200;
               res.writeHead(statusCode, headers);
               var readStream = fs.createReadStream(archive.paths.siteAssets + '/loading.html');
               readStream.pipe(res);     
@@ -70,8 +60,7 @@ var handleUrl = function(req, res, url, statusCode = 200) {
               console.log(e, 'error!');  
             });
 
-          } else {
-
+          } else { // the url is NOT on the list
             console.log('about to append ' + url + ' to the file');
 
             // first time this url is requested
