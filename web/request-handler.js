@@ -4,73 +4,7 @@ var fs = require('fs');
 var querystring = require('querystring');
 const http = require('http');
 // require more modules/folders here!
-
-exports.handleRequest = function (req, res) {
-  //res.end(archive.paths.list);
-  console.log('req.url inside handleRequest ' + req.url + ' req.method' + req.method);
-  var statusCode = 404;
-  var headers = {};
-  headers['Content-type'] = 'text/html';
-  if (req.method === 'GET') {
-    if (req.url === '/') {
-      statusCode = 200;
-      res.writeHead(statusCode, headers);
-      var readStream = fs.createReadStream(archive.paths.siteAssets + '/index.html');
-      readStream.pipe(res);     
-    } else if (req.url === '/styles.css') {
-      statusCode = 200;
-      headers['Content-type'] = 'text/css';
-      var readStream = fs.createReadStream(archive.paths.siteAssets + '/styles.css');
-      readStream.pipe(res);  
-      
-    } else if (req.url === '/favicon.ico') {
-      statusCode = 200;
-      headers['Content-type'] = 'text/css';
-      res.end();
-   
-    } else if (req.url.length > 1) {
-      statusCode = 200;
-      res.writeHead(statusCode, headers);
-      const url = req.url.slice(1);
-      handleUrl(req, res, url);
-
-      // check if the url is in the archive
-        // if so, then return it
-      // if not
-        // check if it is valid
-          // if so, then add it to the list
-          // if not, then return 404
-
-      // res.writeHead(404, headers);
-      // res.end('Your url is invalid');
- 
-    }
-  } else if (req.method === 'POST') {
-    statusCode = 201;
-    let body = '';
-    req.on('data', (data)=>{
-      body += data;
-    });
-    req.on('end', () => {
-      var url = querystring.parse(body).url;
-      handleUrl(req, res, url);
-
-    });
-
-
-    
-
-
-
-    // statusCode = 200;
-    // res.writeHead(statusCode, headers);
-    // var readStream = fs.createReadStream(archive.paths.siteAssets + '/index.html');
-    // readStream.pipe(res);  
-  }
-};
-
-
-function handleUrl(req, res, url) {
+var handleUrl = function(req, res, url) {
   let statusCode = 200;
   let headers = {};
   headers['Content-type'] = 'text/html';
@@ -149,6 +83,10 @@ function handleUrl(req, res, url) {
                 console.log('headers', r.headers);
               } else {
                 console.log('Added ' + url + ' to the list');
+                statusCode = 200;
+                res.writeHead(statusCode, headers);
+                var readStream = fs.createReadStream(archive.paths.siteAssets + '/loading.html');
+                readStream.pipe(res); 
               }
             });
           }
@@ -168,4 +106,88 @@ function handleUrl(req, res, url) {
   });
 
   request.end();  
-}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Start here:
+
+
+exports.handleRequest = function (req, res) {
+  //res.end(archive.paths.list);
+  console.log('req.url inside handleRequest ' + req.url + ' req.method' + req.method);
+  var statusCode = 404;
+  var headers = {};
+  headers['Content-type'] = 'text/html';
+  if (req.method === 'GET') {
+    if (req.url === '/') {
+      statusCode = 200;
+      res.writeHead(statusCode, headers);
+      var readStream = fs.createReadStream(archive.paths.siteAssets + '/index.html');
+      readStream.pipe(res);     
+    } else if (req.url === '/styles.css') {
+      statusCode = 200;
+      headers['Content-type'] = 'text/css';
+      var readStream = fs.createReadStream(archive.paths.siteAssets + '/styles.css');
+      readStream.pipe(res);  
+      
+    } else if (req.url === '/favicon.ico') {
+      statusCode = 200;
+      headers['Content-type'] = 'text/css';
+      res.end();
+   
+    } else if (req.url.length > 1) {
+      statusCode = 200;
+      res.writeHead(statusCode, headers);
+      const url = req.url.slice(1);
+      handleUrl(req, res, url);
+
+      // check if the url is in the archive
+        // if so, then return it
+      // if not
+        // check if it is valid
+          // if so, then add it to the list
+          // if not, then return 404
+
+      // res.writeHead(404, headers);
+      // res.end('Your url is invalid');
+ 
+    }
+  } else if (req.method === 'POST') {
+    statusCode = 201;
+    let body = '';
+    req.on('data', (data)=>{
+      body += data;
+    });
+    req.on('end', () => {
+      var url = querystring.parse(body).url;
+      handleUrl(req, res, url);
+
+    });
+
+
+    
+
+
+
+    // statusCode = 200;
+    // res.writeHead(statusCode, headers);
+    // var readStream = fs.createReadStream(archive.paths.siteAssets + '/index.html');
+    // readStream.pipe(res);  
+  }
+};
+
+
