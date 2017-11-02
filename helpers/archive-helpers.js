@@ -28,18 +28,85 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, 'utf8', (err, data) => {
+    data = data.split('\n');
+    callback(data);
+  });
 };
 
 exports.isUrlInList = function(url, callback) {
+  exports.readListOfUrls(function(arr) {
+    if (arr.indexOf(url) > -1) {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
 };
 
 exports.addUrlToList = function(url, callback) {
+  // append the url to the sites.txt file
+  fs.appendFile(exports.paths.list, url, (error)=> {
+    if (error) {
+      console.log('error!');
+      console.log('headers', r.headers);
+    } else {
+      console.log('Added ' + url + ' to the list');
+      // statusCode = 200;
+      callback(true);
+
+    }
+  });
+
 };
 
 exports.isUrlArchived = function(url, callback) {
+  fs.readFile((exports.paths.archivedSites + '/' + url), (error, data) => {
+
+    if (error) {
+      callback(false);
+    } else {
+      callback(true);
+    }
+  }); 
 };
 
 exports.downloadUrls = function(urls) {
+
+  for (let i = 0; i < urls.length; i++) {
+    const url = urls[i];
+
+    const options = {
+      host: url, 
+      port: 80,
+      path: '/'
+    };
+    
+    http.get(options, (thisResponse)=>{
+      console.log('response object inside get request');
+      // console.log(res);
+      // let body = '';
+
+      // thisResponse.on('data', function(data) {
+      //   body += data;
+      // });
+      // thisResponse.on('end', function() {
+      //   res.end(body);
+      thisResponse.pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
+      
+
+      // statusCode = 200;
+      // let headers = {};
+      // headers['Content-type'] = 'text/html';
+      // res.writeHead(statusCode, headers);
+      // var readStream = fs.createReadStream(exports.paths.siteAssets + '/loading.html');
+      // readStream.pipe(res);     
+
+    }).on('error', (e)=> {
+      console.log(e, 'error!');  
+    });
+  }
+
 };
 
 

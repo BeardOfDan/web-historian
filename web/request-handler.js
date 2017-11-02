@@ -4,8 +4,9 @@ var fs = require('fs');
 var querystring = require('querystring');
 const http = require('http');
 // require more modules/folders here!
-var handleUrl = function(req, res, url) {
-  let statusCode = 200;
+var handleUrl = function(req, res, url, statusCode = 200) {
+
+  // let statusCode = 200;
   let headers = {};
   headers['Content-type'] = 'text/html';
   var options = {
@@ -23,6 +24,7 @@ var handleUrl = function(req, res, url) {
     console.log('about to read the file ' + archive.paths.archivedSites + '/' + url);
 
     fs.readFile((archive.paths.archivedSites + '/' + url), (error, data) => {
+
       if (error) { // if this file does not yet exist
         fs.readFile(archive.paths.list, 'utf-8', (error, data) => {
 
@@ -33,13 +35,11 @@ var handleUrl = function(req, res, url) {
             console.log('Something is wrong');
           }
           data = data.split('\n');
+
+
           if (data.includes(url)) {
 
             console.log('the file includes ' + url);
-
-
-
-            // should be writing the files instead of http.get-ing them
 
             const options = {
               host: url, 
@@ -60,7 +60,8 @@ var handleUrl = function(req, res, url) {
               //   res.end(body);
               thisResponse.pipe(fs.createWriteStream(archive.paths.archivedSites + '/' + url));
               
-              statusCode = 200;
+
+              // statusCode = 200;
               res.writeHead(statusCode, headers);
               var readStream = fs.createReadStream(archive.paths.siteAssets + '/loading.html');
               readStream.pipe(res);     
@@ -69,29 +70,33 @@ var handleUrl = function(req, res, url) {
               console.log(e, 'error!');  
             });
 
-
-
           } else {
 
             console.log('about to append ' + url + ' to the file');
 
             // first time this url is requested
             // add the url to the file
-            fs.appendFile(archive.paths.list, '\n' + url, (error)=> {
+            const currentPath = url + '\n';
+            console.log(currentPath, 'currentPath');
+            fs.appendFile(archive.paths.list, currentPath, (error)=> {
               if (error) {
                 console.log('error!');
                 console.log('headers', r.headers);
               } else {
                 console.log('Added ' + url + ' to the list');
-                statusCode = 200;
+                // statusCode = 200;
+
                 res.writeHead(statusCode, headers);
                 var readStream = fs.createReadStream(archive.paths.siteAssets + '/loading.html');
                 readStream.pipe(res); 
+
               }
             });
           }
         });
       } else { // if the file already exists, send it to the user
+        res.writeHead(statusCode, headers);
+
         res.end(data);
       }
     });
@@ -174,7 +179,8 @@ exports.handleRequest = function (req, res) {
     });
     req.on('end', () => {
       var url = querystring.parse(body).url;
-      handleUrl(req, res, url);
+
+      handleUrl(req, res, url, 302);
 
     });
 
