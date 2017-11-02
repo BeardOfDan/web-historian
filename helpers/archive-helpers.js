@@ -1,6 +1,8 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+const http = require('http');
+const querystring = require('querystring');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -52,3 +54,11 @@ exports.downloadUrls = function(urls) {
 //       7) should check if a url is archived
 //     #downloadUrls
 //       ✓ should download all pending urls in the list (504ms)
+
+// const archive = exports;
+
+// var statusCode = 404;
+//   var headers = {};
+//   headers['Content-type'] = 'text/html';
+
+// exports.
